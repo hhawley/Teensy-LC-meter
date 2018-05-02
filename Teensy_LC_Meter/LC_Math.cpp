@@ -2,7 +2,7 @@
 #include "config.h"
 
 
-uint8_t LC_Math::currentRes = 1;
+uint8_t LC_Math::currentRes = 0;
 elapsedMicros LC_Math::elapsedtime_US = 0;
 elapsedMillis LC_Math::elapsedtime_MS = 0;
 
@@ -22,7 +22,14 @@ void LC_Math::init() {
 void LC_Math::changeResistor() {
 	currentRes++;
 	currentRes = currentRes % 2;
-	digitalWrite(RESISTOR_SELECT_PIN, currentRes % 2);
+  
+	digitalWrite(RESISTOR_SELECT_PIN, currentRes);
+
+  // Clean Measurements
+  _i_Measurement = 0;
+  for(int i = 0; i < NUM_MEASUREMENTS; i++) {
+        _measurementsBuffer[i] = 0;
+  }
 }
 
 void LC_Math::resetTimers() {
@@ -32,10 +39,6 @@ void LC_Math::resetTimers() {
 
 bool LC_Math::measurementComplete() {
 	return _i_Measurement >= NUM_MEASUREMENTS;
-}
-
-uint16_t LC_Math::getCurrentMeasurement() {
-	return _i_Measurement;
 }
 
 
@@ -60,7 +63,7 @@ float LC_Math::calculateFastCapacitance(float median_time, uint8_t& exponent) {
 // C = 1/(R)log_ratio_volt*t*10^(-6) in Farads
 // Much slower, but more precise.
 float LC_Math::calculatePreciseCapacitance(float median_time) {
-  return (log_ratio_volt*median_time*10e-6 / resistancesArrays[currentRes]);
+  return (log_ratio_volt*median_time*1e-6 / resistancesArrays[currentRes]);
 }
 
 float LC_Math::calculateMedian() {
@@ -68,10 +71,11 @@ float LC_Math::calculateMedian() {
 	for(int i = 0; i < NUM_MEASUREMENTS; i++) {
         __medTimeDelay += _measurementsBuffer[i];
         _measurementsBuffer[i] = 0;
-    }
+  }
     
-    __medTimeDelay /= NUM_MEASUREMENTS;
-    return __medTimeDelay;
+  __medTimeDelay /= NUM_MEASUREMENTS;
+  _i_Measurement = 0;
+  return __medTimeDelay;
 }
 
 

@@ -41,7 +41,7 @@ void SegmentDisplay::_displayInterrupt() {
   if ((_displaySegment % NUM_SEGMENTS) == 0) {
 
     int digit1 = displayNum_int % 10;
-    digitalWrite(SEGMENT_BIT_0, (1 & (digit1 >> 0)));
+    digitalWrite(SEGMENT_BIT_0, 1 & (digit1 >> 0));
     digitalWrite(SEGMENT_BIT_1, 1 & (digit1 >> 1));
     digitalWrite(SEGMENT_BIT_2, 1 & (digit1 >> 2));
     digitalWrite(SEGMENT_BIT_3, 1 & (digit1 >> 3));
@@ -50,7 +50,7 @@ void SegmentDisplay::_displayInterrupt() {
   } else  {
 
     int digit2 = (displayNum_int / 10) % 10;
-    digitalWrite(SEGMENT_BIT_0, (1 & (digit2 >> 0)));
+    digitalWrite(SEGMENT_BIT_0, 1 & (digit2 >> 0));
     digitalWrite(SEGMENT_BIT_1, 1 & (digit2 >> 1));
     digitalWrite(SEGMENT_BIT_2, 1 & (digit2 >> 2));
     digitalWrite(SEGMENT_BIT_3, 1 & (digit2 >> 3));

@@ -28,7 +28,7 @@
 #define R1_M 9.93e3 // Ohms
 #define R2_M 98.2e3 // Ohms
 #define V_THRESHOLD 1.240 //V
-#define V_SUPPLY 3.27 //V
+#define V_SUPPLY 3.33 //V
 ///
 
 #define log_ratio_volt 1.0/log(V_SUPPLY/V_THRESHOLD)

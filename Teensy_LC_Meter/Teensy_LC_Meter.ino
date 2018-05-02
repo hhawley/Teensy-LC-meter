@@ -32,21 +32,28 @@ void displayDigit() {
     elapsedtimeSinceDetection = 0;
     medTimeDelay = LC_Math::calculateMedian();
 
-    if (MEASUREMENT_MIN_TIME < 25 || medTimeDelay > MEASUREMENT_MAX_TIME) {
+    if (medTimeDelay < MEASUREMENT_MIN_TIME || medTimeDelay > MEASUREMENT_MAX_TIME) {
         doRotate = true;
         rotateResistance();
         medTimeDelay = 0;
     }
+
+    capacitance_exponent = 0;
     capacitance = LC_Math::calculateFastCapacitance(medTimeDelay, capacitance_exponent);
+
+////  More precise measurement:
+//    capacitance_exponent = 10;
+//    capacitance = LC_Math::calculatePreciseCapacitance(medTimeDelay);
+//    capacitance *= 1e10;
   }
 
   display_number++;
   display_number = display_number % 4;
   if (display_number == 0) {
-    SegmentDisplay::displayLogic(true, (uint8_t)(capacitance / 100));
+    SegmentDisplay::displayLogic(true, (uint8_t)(capacitance / 100.0));
   } 
   else if (display_number == 1) {
-    SegmentDisplay::displayLogic(true, (uint8_t)capacitance);
+    SegmentDisplay::displayLogic(true, (uint8_t)(capacitance));
   }
   else if (display_number == 2) {
     SegmentDisplay::displayLogic(true, capacitance_exponent);
@@ -96,10 +103,10 @@ void rotateResistance() {
 }
 
 void loop() {
-  if (elapsedtimeSinceDetection > 500) {
+  if (elapsedtimeSinceDetection > 2000) {
     doRotate = true;
     rotateResistance();
-    elapsedtimeSinceDetection = elapsedtimeSinceDetection - 500;
+    elapsedtimeSinceDetection = elapsedtimeSinceDetection - 2000;
   }
 
   if(elapsedDigitTime > 500) {
