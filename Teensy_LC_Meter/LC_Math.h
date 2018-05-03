@@ -29,6 +29,9 @@
 #define R2_M 98.2e3 // Ohms
 #define V_THRESHOLD 1.240 //V
 #define V_SUPPLY 3.33 //V
+
+#define TOTAL_CAP 1
+#define C1_M 100e-9
 ///
 
 #define log_ratio_volt 1.0/log(V_SUPPLY/V_THRESHOLD)
@@ -38,24 +41,39 @@ const float resistancesArrays[TOTAL_RES] = {R1_M, R2_M};
 class LC_Math {
 public:
 
-	static uint8_t currentRes;
-	static elapsedMicros elapsedtime_US;
-	static elapsedMillis elapsedtime_MS;
-
 	static void init();
+	static void update();
+	static bool measurementReady();
+
 	static void changeResistor();
-	static float calculateFastCapacitance(float median_time, uint8_t& exponent);
-	static float calculatePreciseCapacitance(float median_time);
+
+	static void getLastestMeasurement(float& capacitance, uint8_t& exponent);
+	static bool measurementsComplete();
+	static void measurementHasBeenShown();
+	static bool isCapacitorPresent();
 
 	static void resetTimers();
-	static bool measurementComplete();
-	static float calculateMedian();
+
 
 private:
 	static void _measureDelay();
+	static float _calculateFastCapacitance(float median_time, uint8_t& exponent);
+	static float _calculatePreciseCapacitance(float median_time);
+	
+	static float _calculateMedian();
+
+	static float _measuredCapacitance;
+	static uint8_t _measuredCapacitanceExponent;
 
 	static uint16_t _measurementsBuffer[NUM_MEASUREMENTS];
 	static uint16_t _lastMeasurement;
 	static uint8_t _i_Measurement;
+
+	static uint8_t _currentRes;
+	static elapsedMicros _elapsedtime_US;
+	static elapsedMillis _elapsedtime_MS;
+	static elapsedMillis _elapsedtimeSinceDetection;
+
+	static bool _measurementShown;
 
 };

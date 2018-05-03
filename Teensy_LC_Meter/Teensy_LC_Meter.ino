@@ -28,42 +28,30 @@ float medTimeDelay = 0;
 float capacitance = 0;
 uint8_t capacitance_exponent = 0;
 void displayDigit() {
-  if(LC_Math::measurementComplete()) {
+
+  if(LC_Math::measurementReady() && LC_Math::isCapacitorPresent()) {
     elapsedtimeSinceDetection = 0;
-    medTimeDelay = LC_Math::calculateMedian();
-
-    if (medTimeDelay < MEASUREMENT_MIN_TIME || medTimeDelay > MEASUREMENT_MAX_TIME) {
-        doRotate = true;
-        rotateResistance();
-        medTimeDelay = 0;
+    LC_Math::getLastestMeasurement(capacitance, capacitance_exponent);
+    
+    display_number++;
+    display_number = display_number % 3;
+    switch(display_number) {
+      case 0:
+        SegmentDisplay::displayLogic(true, (uint8_t)(capacitance / 100.0));
+        break;
+      case 1:
+        SegmentDisplay::displayLogic(true, (uint8_t)(capacitance));
+        break;
+      case 2:
+        SegmentDisplay::displayLogic(true, capacitance_exponent);
+        LC_Math::measurementHasBeenShown();
+        break;
     }
-
-    capacitance_exponent = 0;
-    capacitance = LC_Math::calculateFastCapacitance(medTimeDelay, capacitance_exponent);
-
-////  More precise measurement:
-//    capacitance_exponent = 10;
-//    capacitance = LC_Math::calculatePreciseCapacitance(medTimeDelay);
-//    capacitance *= 1e10;
-  }
-
-  display_number++;
-  display_number = display_number % 4;
-  if (display_number == 0) {
-    SegmentDisplay::displayLogic(true, (uint8_t)(capacitance / 100.0));
-  } 
-  else if (display_number == 1) {
-    SegmentDisplay::displayLogic(true, (uint8_t)(capacitance));
-  }
-  else if (display_number == 2) {
-    SegmentDisplay::displayLogic(true, capacitance_exponent);
-  } 
-  else if(display_number == 3){
-    SegmentDisplay::displayLogic(false, 42);
-  } 
-  else {
+  } else {
     SegmentDisplay::displayLogic(false, 42);
   }
+  
+
 
 }
 
@@ -103,10 +91,11 @@ void rotateResistance() {
 }
 
 void loop() {
-  if (elapsedtimeSinceDetection > 2000) {
+  LC_Math::update();
+  if (elapsedtimeSinceDetection > 5000) {
     doRotate = true;
     rotateResistance();
-    elapsedtimeSinceDetection = elapsedtimeSinceDetection - 2000;
+    elapsedtimeSinceDetection = elapsedtimeSinceDetection - 5000;
   }
 
   if(elapsedDigitTime > 500) {
