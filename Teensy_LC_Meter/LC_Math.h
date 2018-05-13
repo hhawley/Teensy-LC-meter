@@ -17,10 +17,14 @@
 #define NUM_MEASUREMENTS 64
 
 // Math Defines
+
 #define PULSE_ON_TIME 10000 //us
 #define PULSE_OFF_TIME 10000 //us
-#define MEASUREMENT_MAX_TIME PULSE_ON_TIME/2 //us
-#define MEASUREMENT_MIN_TIME 25 //us
+
+#define US_TO_CLKCNTS 48
+#define CLKCNTS_TO_US 1/48.0
+#define MEASUREMENT_MAX_TIME (PULSE_ON_TIME/2)*US_TO_CLKCNTS //clk ctns
+#define MEASUREMENT_MIN_TIME 25*US_TO_CLKCNTS //clk ctns
 
 /// Change this values to the measurements you made
 /// for more precise measurements.
@@ -57,20 +61,23 @@ public:
 
 private:
 	static void _measureDelay();
+	static void _measureFreq();
 	static float _calculateFastCapacitance(float median_time, uint8_t& exponent);
 	static float _calculatePreciseCapacitance(float median_time);
+	static float _calculatePreciseInductance(float median_time);
 	
 	static float _calculateMedian();
 
 	static float _measuredCapacitance;
 	static uint8_t _measuredCapacitanceExponent;
 
-	static uint16_t _measurementsBuffer[NUM_MEASUREMENTS];
-	static uint16_t _lastMeasurement;
+	static uint32_t _measurementsBuffer[NUM_MEASUREMENTS];
+	static uint32_t _lastMeasurement;
+	static uint32_t _previousMeasurement;
+	static uint32_t _elapsedtime_CS;
 	static uint8_t _i_Measurement;
 
 	static uint8_t _currentRes;
-	static elapsedMicros _elapsedtime_US;
 	static elapsedMillis _elapsedtime_MS;
 	static elapsedMillis _elapsedtimeSinceDetection;
 
